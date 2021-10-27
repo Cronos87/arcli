@@ -42,7 +42,7 @@ func (c *Client) GetProject(id int64) (*Project, error) {
 }
 
 // GetProjects fetches all projects viewable by currently logged user.
-func (c *Client) GetProjects() ([]Project, error) {
+func (c *Client) GetProjects(showAll bool) ([]Project, error) {
 	req, err := c.getRequest("/projects.json", "limit=200")
 	if err != nil {
 		return nil, err
@@ -52,6 +52,18 @@ func (c *Client) GetProjects() ([]Project, error) {
 	_, err = c.Do(req, &response)
 	if err != nil {
 		return nil, err
+	}
+
+	if !showAll {
+		var projectsFiltered []Project
+
+		for _, project := range response.Projects {
+			if project.Status == 1 {
+				projectsFiltered = append(projectsFiltered, project)
+			}
+		}
+
+		return projectsFiltered, nil
 	}
 
 	return response.Projects, nil

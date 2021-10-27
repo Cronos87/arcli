@@ -67,7 +67,8 @@ func newMyProjectsCmd() *cobra.Command {
 		Aliases: []string{"all", "show", "ls", "list"},
 		Short:   "List all projects visible to user",
 		Run: func(cmd *cobra.Command, args []string) {
-			projects, err := RClient.GetProjects()
+			showAll, _ := cmd.Flags().GetBool("all")
+			projects, err := RClient.GetProjects(showAll)
 			if err != nil {
 				fmt.Println("Cannot fetch projects:", err)
 				return
@@ -76,6 +77,8 @@ func newMyProjectsCmd() *cobra.Command {
 			drawProjects(projects)
 		},
 	}
+
+	c.Flags().BoolP("all", "a", false, "Show all projects (that includes closed or archived projects)")
 
 	return c
 }
